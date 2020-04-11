@@ -22,6 +22,9 @@ print(data.decode("utf-8"))
 
 import requests
 import simplejson as json
+import time
+from datetime import datetime
+from datetime import timedelta
 
 
 def main():
@@ -29,29 +32,51 @@ def main():
     value = input(
         "Which planet do you want to know about? Type a number between 1 and 10 - or however many planets there are...!\n")
     """
+    city = 'Cairo'
 
     response = requests.get(
-        "http://api.openweathermap.org/data/2.5/forecast?q=London&appid=23b9b2cda2de73f546fb9ac14d881d73")
+        "http://api.openweathermap.org/data/2.5/forecast?q={0}&appid=23b9b2cda2de73f546fb9ac14d881d73".format(city))
 
-    print(response.status_code)
+    tomorrow_date = time.gmtime(response.json()['list'][0]['dt']).tm_mday + 1
 
-    print(response.json())
+    def get_results_for_tomorrow():
+        # print(tomorrow_date)
+        results = []
+        for forecast in response.json()['list']:
+            text = forecast['dt_txt']
+            sub_s = text[8:10]
+            if (sub_s == str(tomorrow_date)):
+                # print(text)
+                results.append(forecast)
+        return results
+
+    results = get_results_for_tomorrow()
+    for res in results:
+        print(res['dt_txt'] + ": " + res['weather'][0]['main'])
+
+    #print("*****************************\nTime in 24 hrs: \n")
+    #print(datetime.now() + timedelta(days=1))
+    # print(response.json()['list'][0])
+
+    tomorrow_date = time.gmtime(response.json()['list'][0]['dt']).tm_mday + 1
+
+    twenty_four_hours = 86400
 
     """
     jayson = response.json()
 
     string = response.text
 
-    #planets = json.loads(string)
+    # planets = json.loads(string)
 
     for key in jayson:
         if (key == 'results'):
-            #print("JSN.RESULTS IS TYPE: " + str(type(jayson[key])))
+            # print("JSN.RESULTS IS TYPE: " + str(type(jayson[key])))
             for i in range(len(jayson[key])):
                 print("PLANET: " + str(i) + ": " + str(jayson[key][i]['name']))
                 i += 1
 
-            #print(key, '--->', jayson[key])
+            # print(key, '--->', jayson[key])
 
     # for planet in planets:
     #   print("The planet is called: " + planet.results['name'])
