@@ -25,21 +25,30 @@ import simplejson as json
 import time
 from datetime import datetime
 from datetime import timedelta
+import argparse
+import flight_service
 
 
-def main():
-    """
-    value = input(
-        "Which planet do you want to know about? Type a number between 1 and 10 - or however many planets there are...!\n")
-    """
-    city = 'Cairo'
+class Weather_Service:
+    def __init__(self, city):
+        self.city = city
 
-    response = requests.get(
-        "http://api.openweathermap.org/data/2.5/forecast?q={0}&appid=23b9b2cda2de73f546fb9ac14d881d73".format(city))
+    def call_weather_api(self):
+        """
+        value = input(
+            "Which planet do you want to know about? Type a number between 1 and 10 - or however many planets there are...!\n")
+        """
 
-    tomorrow_date = time.gmtime(response.json()['list'][0]['dt']).tm_mday + 1
+        response = requests.get(
+            "http://api.openweathermap.org/data/2.5/forecast?q={0}&appid=23b9b2cda2de73f546fb9ac14d881d73".format(self.city))
 
-    def get_results_for_tomorrow():
+        tomorrow_date = time.gmtime(
+            response.json()['list'][0]['dt']).tm_mday + 1
+
+        data = self.get_results_for_tomorrow(response, tomorrow_date)
+        return data
+
+    def get_results_for_tomorrow(self, response, tomorrow_date):
         # print(tomorrow_date)
         results = []
         for forecast in response.json()['list']:
@@ -50,15 +59,11 @@ def main():
                 results.append(forecast)
         return results
 
-    results = get_results_for_tomorrow()
-    for res in results:
-        print(res['dt_txt'] + ": " + res['weather'][0]['main'])
-
     #print("*****************************\nTime in 24 hrs: \n")
     #print(datetime.now() + timedelta(days=1))
     # print(response.json()['list'][0])
 
-    tomorrow_date = time.gmtime(response.json()['list'][0]['dt']).tm_mday + 1
+    #tomorrow_date = time.gmtime(response.json()['list'][0]['dt']).tm_mday + 1
 
     twenty_four_hours = 86400
 
@@ -81,6 +86,30 @@ def main():
     # for planet in planets:
     #   print("The planet is called: " + planet.results['name'])
 """
+
+
+def get_args():
+    """Get the command line arguments and create help output"""
+
+    parser = argparse.ArgumentParser(
+        description='Get a city to look up weather for')
+    parser.add_argument('-c', '--city', default="Lisbon",
+                        help='A city to search tomorrow\'s weather for', metavar='city')
+    args = parser.parse_args()
+    return args
+
+
+def main():
+    args = get_args()
+    ws = Weather_Service(args.city)
+
+    weather_data = ws.call_weather_api()
+    for d in weather_data:
+        print(d['dt_txt'] + ": " + d['weather'][0]['main'])
+
+    fs = flight_service.Flight_Service(args.city)
+    flight_data = fs.call_flight_api()
+    print(flight_data)
 
 
 if __name__ == '__main__':
