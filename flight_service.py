@@ -41,6 +41,16 @@ class Flight_Service:
                         'No flights could be found for this location on this date.  Try a different location and/or date!')
                 else:
                     for res in response.data:
-                        print(res['price'])
+                        print("Flight: Departing {departure_location} at {departure_time}.  Price: {price}".format(departure_location=str(res['itineraries'][0]['segments']
+                                                                                                                                          [0]['departure']['iataCode']), departure_time=str(res['itineraries'][0]['segments']
+                                                                                                                                                                                            [0]['departure']['at']), price=str(res['price']['total'])))
+                        """
+                        print(res['price']['total'])
+                        print(res['itineraries'][0]['segments']
+                              [0]['departure']['iataCode'])
+                        print(res['itineraries'][0]['segments']
+                              [0]['departure']['at'])
+                        """
+                        # txt1 = "Flight: {f}, I'am {age}".format(fname = "John", age = 36)
             except ResponseError as error:
                 print(error)
