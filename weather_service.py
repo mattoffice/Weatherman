@@ -103,13 +103,16 @@ def main():
     args = get_args()
     ws = Weather_Service(args.city)
 
+    outbound_date = ''
+
     weather_data = ws.call_weather_api()
+    outbound_date = weather_data[0]['dt_txt'][0:10]
+    print(outbound_date)
     for d in weather_data:
         print(d['dt_txt'] + ": " + d['weather'][0]['main'])
 
     fs = flight_service.Flight_Service(args.city)
-    flight_data = fs.call_flight_api()
-    print(flight_data)
+    flight_data = fs.call_amadeus()
 
 
 if __name__ == '__main__':
