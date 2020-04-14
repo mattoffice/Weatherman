@@ -4,8 +4,9 @@ from amadeus import Client, ResponseError, Location
 
 
 class Flight_Service:
-    def __init__(self, city):
+    def __init__(self, city, date):
         self.city = city
+        self.outbound_date = date
         self.api_key = 'Z9Fb2VEMHPrPue68nDfMhPV5Z8cj1YT3'
         self.api_secret = 'cRtDOOmAuRKL9RUv'
 
@@ -19,7 +20,7 @@ class Flight_Service:
         try:
             amadeus_resp = amadeus.reference_data.locations.get(
                 keyword=str(self.city),
-                subType=Location.ANY
+                subType=Location.CITY
             )
             if(amadeus_resp.data):
                 desired_location = amadeus_resp.data[0]['iataCode']
@@ -34,7 +35,7 @@ class Flight_Service:
                 response = amadeus.shopping.flight_offers_search.get(
                     originLocationCode='LGW',
                     destinationLocationCode=str(desired_location),
-                    departureDate='2020-07-01',
+                    departureDate=self.outbound_date,
                     adults=1)
                 if(len(response.data) == 0):
                     print(

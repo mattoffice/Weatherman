@@ -111,7 +111,7 @@ def main():
     for d in weather_data:
         print(d['dt_txt'] + ": " + d['weather'][0]['main'])
 
-    fs = flight_service.Flight_Service(args.city)
+    fs = flight_service.Flight_Service(args.city, outbound_date)
     flight_data = fs.call_amadeus()
 
 
