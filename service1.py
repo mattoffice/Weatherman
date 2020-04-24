@@ -11,9 +11,9 @@ def main():
     response = requests.get(
         "https://swapi.co/api/planets/")
 
-    # print(response.status_code)
+    print(response.status_code)
 
-    # print(response.json())
+    print(response.json())
 
     jayson = response.json()
 

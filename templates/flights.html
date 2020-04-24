@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flights</title>
+</head>
+<body>
+    <h1>Flights</h1>
+<p>Flights to Madrid on whatever date...</p>
+</br>
+<div class="container">
+    <h3>Flights to Madrid:</h3>
+    <ul>
+      {% for n in flight_data %}
+      <li>{{n}}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</body>
+</html>

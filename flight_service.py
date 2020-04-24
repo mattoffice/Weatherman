@@ -9,6 +9,7 @@ class Flight_Service:
         self.outbound_date = date
         self.api_key = 'Z9Fb2VEMHPrPue68nDfMhPV5Z8cj1YT3'
         self.api_secret = 'cRtDOOmAuRKL9RUv'
+        self.data = None
 
     def call_amadeus(self):
 
@@ -41,6 +42,7 @@ class Flight_Service:
                     print(
                         'No flights could be found for this location on this date.  Try a different location and/or date!')
                 else:
+                    self.data = response.data
                     for res in response.data:
                         print("Flight: Departing {departure_location} at {departure_time}.  Price: {price}".format(departure_location=str(res['itineraries'][0]['segments']
                                                                                                                                           [0]['departure']['iataCode']), departure_time=str(res['itineraries'][0]['segments']
