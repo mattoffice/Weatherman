@@ -41,9 +41,14 @@ class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, index=True)
-    latitude = db.Column(db.Float)
-    longitude = db.Column(db.Float)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+
+    def __init__(self, username, latitude, longitude):
+        self.username = username
+        self.latitude = latitude
+        self.longitude = longitude
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -95,7 +100,8 @@ def home():
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.name.data).first()
         if user is None:
-            user = User(username=form.name.data)
+            user = User(username=form.name.data,
+                        latitude=float(55.0176), longitude=float(4.764))
             db.session.add(user)
             db.session.commit()
             session['known'] = False
