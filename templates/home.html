@@ -1,11 +1,33 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  </head>
 <body>
 <h1>Weatherman</h1>
 <p>Welcome to Weatherman</p>
 </br>
 <div class="container">
-    <h2>Check out the weather at <em>/weather</em>, and flights at <em>/flights</em></h2>
+  <div>
+  <h1>Greetings {% if name %}{{ name }}{% else %}Stranger{% endif %}!</h1>
+  {% if not known %}    
+  <p>Pleased to meet you!</p>    
+  {% else %}    
+  <p>Happy to see you again!</p>    
+  {% endif %}
   </div>
+    <h2>Who are ya? <a href="{{ url_for('user', name='Matthew') }}">Check here</a></h2>
+    <h2>Check out the weather at <a href="{{ url_for('serve_weather') }}">/weather</a>, and flights at <a href="{{ url_for('serve_flights') }}">/flights</a></h2>
+  </div>
+  <div>
+    <p>{{url_for}}</p>
+    <p>{{now}}</p>
+    <form method="POST">    
+      {{ form.hidden_tag() }}    
+      {{ form.name.label }} {{ form.name() }}    
+      {{ form.submit() }}
+    </form>
+  </div>
+
 </body>
 </html>
