@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src='https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.css' rel='stylesheet' />
+    <title>Map</title>
+</head>
+<body>
+    <div class="container">
+
+        <font face="verdana" size='7'>Mapbox map in Weatherman</font><br/><br/>
+        <input class="inputBox" type="number" id="Longitude" placeholder="Enter Longitude"/>
+        <input class="inputBox" type="number" id="Latitude" placeholder="Enter Latitude"/>
+        <button class="button" onclick="getLonLat()">Submit</button>
+        <div id="map" style='width: 95%; height:500px;'></div><br/><br/>
+
+    </div>
+
+    <script>
+
+        var longitude, latitude;
+        function getLonLat() {
+            longitude = document.getElementById("Longitude").value;
+            latitude = document.getElementById("Latitude").value;
+            displayMap(longitude, latitude);
+        }
+        function displayMap(longitude=-1.435385, latitude=55.019037) {
+            mapboxgl.accessToken = "{{ mapbox_access_token }}"
+            var map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/satellite-streets-v10',
+                center: [longitude, latitude],
+                zoom: 5,
+                bearing: -17.6,
+                pitch: 45
+            });
+
+            var marker = new mapboxgl.Marker()
+                .setLngLat([longitude, latitude])
+                .addTo(map);  
+        }
+
+        displayMap();
+
+    </script>
+</body>
+</html>

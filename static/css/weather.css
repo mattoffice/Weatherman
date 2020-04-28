@@ -1,0 +1,40 @@
+/*body, html {
+    height: 100%;
+  }
+
+.bg {
+    
+    background-image: url("../mulholland-dr-2001-007-naomi-watts-david-lynch-on-set-00n-4tk-1000x750.jpg");
+  
+    
+    height: 100%;
+  
+    
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}*/
+
+html {
+    background: url("../mulholland-dr-2001-007-naomi-watts-david-lynch-on-set-00n-4tk-1000x750.jpg") no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+ul, li {
+    color: black;
+}
+
+h1 {
+    color: darkblue;
+}
+
+#container {
+    background-color: green;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+

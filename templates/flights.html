@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <title>Flights</title>
 </head>
 <body>
-    <h1>Flights</h1>
-<p>Flights to Madrid on whatever date...</p>
+    <h1>Flights to {{ destination }} on 2020-08-01</h1>
 </br>
 <div class="container">
-    <h3>Flights to Madrid:</h3>
     <ul>
       {% for n in flight_data %}
       <li>{{n}}</li>

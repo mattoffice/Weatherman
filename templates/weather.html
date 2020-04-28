@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/weather.css') }}">
     <title>Weather</title>
 </head>
 <body>
-    <div class="container">
-        <h3>Weather forecast for Madrid for tomorrow:</h3>
+    <div id="container">
+        <h1>Weather forecast for {{ destination }} for tomorrow:</h1>
         <ul>
           {% for n in weather_data %}
           <li>{{n}}</li>

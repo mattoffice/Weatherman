@@ -1,33 +1,102 @@
 <!DOCTYPE html>
+  {% extends "bootstrap/base.html" %}
+  {% import "bootstrap/wtf.html" as wtf %}
 <html>
+    {% block head %}
+    {{ super() }}
   <head>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src='https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.css' rel='stylesheet' />
   </head>
+    {% endblock %}
+  
 <body>
-<h1>Weatherman</h1>
-<p>Welcome to Weatherman</p>
-</br>
+  
+
+  {% block title %}Weatherman{% endblock %}
+
+{% block navbar %}
+<div class="navbar navbar-inverse" role="navigation">    
+  <div class="container">        
+    <div class="navbar-header">            
+      <button type="button" class="navbar-toggle"             
+      data-toggle="collapse" data-target=".navbar-collapse">                
+        <span class="sr-only">Toggle navigation</span>                
+        <span class="icon-bar"></span>                
+        <span class="icon-bar"></span>                
+        <span class="icon-bar"></span>            
+      </button>            
+      <a class="navbar-brand" href="/">Weatherman</a>        
+    </div>        
+    <div class="navbar-collapse collapse">            
+      <ul class="nav navbar-nav">  
+        <li><a href="{{ url_for('serve_weather', destination=location) }}">Weather</a></li>              
+        <li><a href="{{ url_for('serve_flights', destination=location) }}">Flights</a></li> 
+        <li><a href="/map">Map</a></li>
+      </ul>        
+    </div>    
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
 <div class="container">
   <div>
   <h1>Greetings {% if name %}{{ name }}{% else %}Stranger{% endif %}!</h1>
-  {% if not known %}    
-  <p>Pleased to meet you!</p>    
-  {% else %}    
-  <p>Happy to see you again!</p>    
-  {% endif %}
+  <h3>Your are located at {% if latitude %}{{ latitude }}° latitude{% else %}<i>unknown latitude</i>{% endif %}, {% if longitude %}{{ longitude }}° longitude{% else %}
+    <i>unknown longitude</i>{% endif %}.
+  </h3>
   </div>
-    <h2>Who are ya? <a href="{{ url_for('user', name='Matthew') }}">Check here</a></h2>
-    <h2>Check out the weather at <a href="{{ url_for('serve_weather') }}">/weather</a>, and flights at <a href="{{ url_for('serve_flights') }}">/flights</a></h2>
+    <h4>Check out the weather at <a href="{{ url_for('serve_weather', destination=location) }}">/weather</a>, and flights at <a href="{{ url_for('serve_flights', destination=location) }}">/flights</a></h4>
   </div>
-  <div>
-    <p>{{url_for}}</p>
-    <p>{{now}}</p>
-    <form method="POST">    
-      {{ form.hidden_tag() }}    
-      {{ form.name.label }} {{ form.name() }}    
-      {{ form.submit() }}
-    </form>
-  </div>
+    {{ wtf.quick_form(form) }}
+    <div>
+      <p>{{now}}</p>
+      <p>Address coming from view function: {{ address }}</p>
+      <p>Coordinates coming from view function: {{ coords }}</p>
+      <p>Location var coming from view function: {{ location }}</p>
+    </div>
+    <div class="container">
 
+      <font face="bookman" size='7'>Where is Weatherman today??</font><br/><br/>
+      <p class="inputBox" type="number" id="Longitude" placeholder="Enter Longitude">{{ coords[0] }}</p>
+      <p class="inputBox" type="number" id="Latitude" placeholder="Enter Latitude">{{ coords[1] }}</p>
+      <button class="button" onclick="getLonLat()">Update location!</button>
+      <div id="map" style='width: 95%; height:500px;'></div><br/><br/>
+    
+    </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+
+  var longitude, latitude;
+  function getLonLat() {
+      longitude = document.getElementById("Longitude").textContent;
+      latitude = document.getElementById("Latitude").textContent;
+      displayMap(longitude, latitude);
+  }
+  function displayMap(longitude=-1.435385, latitude=55.019037) {
+      mapboxgl.accessToken = "{{ mapbox_access_token }}"
+      var map = new mapboxgl.Map({
+          container: 'map',
+          style: 'mapbox://styles/mapbox/satellite-streets-v10',
+          center: [longitude, latitude],
+          zoom: 5,
+          bearing: -17.6,
+          pitch: 45
+      });
+
+      var marker = new mapboxgl.Marker()
+          .setLngLat([longitude, latitude])
+          .addTo(map);  
+  }
+
+  displayMap();
+
+</script>
+{% endblock %}
 </body>
 </html>
