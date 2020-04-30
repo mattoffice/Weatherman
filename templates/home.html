@@ -31,8 +31,8 @@
     </div>        
     <div class="navbar-collapse collapse">            
       <ul class="nav navbar-nav">  
-        <li><a href="{{ url_for('serve_weather', destination=current_location) }}">Weather</a></li>              
-        <li><a href="{{ url_for('serve_flights', destination=current_location) }}">Flights</a></li> 
+        <li><a href="{{ url_for('serve_weather', destination=desired_location) }}">Weather</a></li>              
+        <li><a href="{{ url_for('serve_flights', destination=desired_location) }}">Flights</a></li> 
         <li><a href="/map">Map</a></li>
       </ul>        
     </div>    
@@ -44,26 +44,28 @@
 <div class="container">
   <div>
   <h1>Greetings {% if name %}{{ name }}{% else %}Stranger{% endif %}!</h1>
-  <h3>Your are located at {% if latitude %}{{ latitude }}° latitude{% else %}<i>unknown latitude</i>{% endif %}, {% if longitude %}{{ longitude }}° longitude{% else %}
+  <h3>Your are located at {% if starting_coords %}{{ starting_coords[0] }}° latitude{% else %}<i>unknown latitude</i>{% endif %}, {% if starting_coords %}{{ starting_coords[1] }}° longitude{% else %}
     <i>unknown longitude</i>{% endif %}.
   </h3>
   </div>
-    <h4>Check out the weather at <a href="{{ url_for('serve_weather', destination=current_location) }}">/weather</a>, and flights at <a href="{{ url_for('serve_flights', destination=current_location) }}">/flights</a></h4>
+    <h4>Check out the weather at <a href="{{ url_for('serve_weather', destination=desired_location) }}">/weather</a>, and flights at <a href="{{ url_for('serve_flights', destination=desired_location) }}">/flights</a></h4>
   </div>
     {{ wtf.quick_form(form) }}
     <div>
+      <h3>{{ desired_location }}{% if desired_location != ''%}! Good choice...{% endif %}</h3>
+      <br>
       <p>{{now}}</p>
-      <p>Current Location coming from view function: {{ current_location }}</p>
-      <p>Coordinates coming from view function: {{ coords }}</p>
-      <p>Location var coming from view function: {{ location }}</p>
     </div>
     <div class="container">
 
-      <font face="bookman" size='7'>Where is Weatherman today??</font><br/><br/>
+      <font face="bookman" size='7'>Oh where could Weatherman be tomorrow, or next year???</font><br/><br/>
+      <button class="button" onclick="getLonLat()">Update map to see where you could be flying to tomorrow...</button>
+      <hr>
+      <div id="map" style='width: 95%; height:500px;'></div><br/><br/>
+
+      <p>Current Coordinates</p>
       <p class="inputBox" type="number" id="Longitude" placeholder="Enter Longitude">{{ coords[0] }}</p>
       <p class="inputBox" type="number" id="Latitude" placeholder="Enter Latitude">{{ coords[1] }}</p>
-      <button class="button" onclick="getLonLat()">Update location!</button>
-      <div id="map" style='width: 95%; height:500px;'></div><br/><br/>
     
     </div>
 {% endblock %}
@@ -78,14 +80,14 @@
       latitude = document.getElementById("Latitude").textContent;
       displayMap(longitude, latitude);
   }
-  function displayMap(longitude=-1.435385, latitude=55.019037) {
+  function displayMap(longitude=-1.434999, latitude=55.019037) {
       mapboxgl.accessToken = "{{ mapbox_access_token }}"
       var map = new mapboxgl.Map({
           container: 'map',
           style: 'mapbox://styles/mapbox/satellite-streets-v10',
           center: [longitude, latitude],
-          zoom: 18,
-          bearing: -17.6,
+          zoom: 8,
+          bearing: -16.5,
           pitch: 45
       });
 

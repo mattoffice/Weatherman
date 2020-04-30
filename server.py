@@ -33,6 +33,8 @@ class NameForm(FlaskForm):
     name = StringField('What is your name?', validators=[DataRequired()])
     current_location = StringField('Where are you now?',
                                    validators=[DataRequired()])
+    desired_location = StringField(
+        'And where are you thinking og travelling to?', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 
@@ -92,16 +94,18 @@ def home():
     name = None
     current_location = 'Algernon Terrace'
     coords = [-1.435385, 55.019037]
-    location = ''
+    starting_coords = coords
+    desired_location = ''
     form = NameForm()
 
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.name.data).first()
         name = form.name.data
         current_location = form.current_location.data
+        desired_location = form.desired_location.data
         geocoder = Geocoder(
             access_token="pk.eyJ1IjoibWF0dG9mZmljZSIsImEiOiJjazlqdHYwZ2kwMHBxM2xscmF5bzdpc2dsIn0.iDUw71WZCer5ZrbOkEusqg")
-        coords = geocoder.forward(current_location).json()[
+        coords = geocoder.forward(desired_location).json()[
             'features'][0]['geometry']['coordinates']
         if user is None:
             user = User(username=form.name.data,
@@ -111,9 +115,12 @@ def home():
             db.session.commit()
         session['name'] = name
         session['current_location'] = current_location
+        current_location = session['current_location']
         form.name.data = ''
         form.current_location.data = ''
-    return render_template('home.html', form=form, name=session.get('name'), current_location=session.get('current_location'), coords=coords, mapbox_access_token=mapbox_access_token)
+        form.desired_location.data = ''
+    return render_template('home.html', form=form, name=session.get('name'), starting_coords=starting_coords,
+                           desired_location=desired_location, current_location=current_location, coords=coords, mapbox_access_token=mapbox_access_token)
 
 
 @app.route('/flights/<destination>', methods=['GET'])
