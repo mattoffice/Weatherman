@@ -3,38 +3,40 @@ import datetime
 from flask import Flask, jsonify, render_template, url_for, g, redirect, session, request
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate, MigrateCommand
 from flask_wtf import FlaskForm
 from wtforms import StringField, FloatField, SubmitField
 from wtforms.validators import DataRequired, Length, Email, Regexp
-from tronald import tronald_dumps
-from flask_migrate import Migrate
+#from tronald import tronald_dumps
 from mapbox import Geocoder
 import flight_service
 import weather_service
 
 app = Flask(__name__)
 target_port = 3000
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
-    os.path.join(basedir, 'wman.sqlite')
+bootstrap = Bootstrap(app)
+
+DB_URL = 'postgresql+psycopg2://postgres:Castelldefels@34.76.239.106/postgres'
+app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'castelldefels'
+app.config['SECRET_KEY'] = 'rosario'
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-bootstrap = Bootstrap(app)
+
+
 location = ''
 destination = 'Malaga'
 
 
 class NameForm(FlaskForm):
     name = StringField('What is your name?', validators=[DataRequired()])
-    address = StringField('What is your address?', validators=[DataRequired()])
+    current_location = StringField('Where are you now?',
+                                   validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 
 class Role(db.Model):
-    __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
     users = db.relationship('User', backref='role')
@@ -44,26 +46,17 @@ class Role(db.Model):
 
 
 class User(db.Model):
-    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), unique=True, index=True)
-    latitude = db.Column(db.String(64), unique=True, index=True)
-    longitude = db.Column(db.String(64), unique=True, index=True)
-    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    username = db.Column(db.String(80), unique=False, nullable=True)
+    currentLocation = db.Column(db.String(120), unique=False, nullable=True)
+    role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
 
-    def __init__(self, username, latitude, longitude):
+    def __init__(self, username, currentLocation):
         self.username = username
-        self.latitude = latitude
-        self.longitude = longitude
+        self.currentLocation = currentLocation
 
     def __repr__(self):
         return '<User %r>' % self.username
-
-
-
-@app.shell_context_processor
-def make_shell_context():
-    return dict(db=db, User=User, Role=Role)
 
 
 @app.context_processor
@@ -97,20 +90,30 @@ def user(name):
 def home():
     mapbox_access_token = 'pk.eyJ1IjoibWF0dG9mZmljZSIsImEiOiJjazlqdHYwZ2kwMHBxM2xscmF5bzdpc2dsIn0.iDUw71WZCer5ZrbOkEusqg'
     name = None
-    address = 'Algernon Terrace'
+    current_location = 'Algernon Terrace'
     coords = [-1.435385, 55.019037]
     location = ''
     form = NameForm()
 
     if form.validate_on_submit():
+        user = User.query.filter_by(username=form.name.data).first()
         name = form.name.data
-        address = form.address.data
-        location = form.address.data
+        current_location = form.current_location.data
         geocoder = Geocoder(
             access_token="pk.eyJ1IjoibWF0dG9mZmljZSIsImEiOiJjazlqdHYwZ2kwMHBxM2xscmF5bzdpc2dsIn0.iDUw71WZCer5ZrbOkEusqg")
-        coords = geocoder.forward(address).json()[
+        coords = geocoder.forward(current_location).json()[
             'features'][0]['geometry']['coordinates']
-    return render_template('home.html', form=form, name=name, address=address, coords=coords, mapbox_access_token=mapbox_access_token, location=location)
+        if user is None:
+            user = User(username=form.name.data,
+                        currentLocation=current_location)
+            db.session.add(user)
+
+            db.session.commit()
+        session['name'] = name
+        session['current_location'] = current_location
+        form.name.data = ''
+        form.current_location.data = ''
+    return render_template('home.html', form=form, name=session.get('name'), current_location=session.get('current_location'), coords=coords, mapbox_access_token=mapbox_access_token)
 
 
 @app.route('/flights/<destination>', methods=['GET'])

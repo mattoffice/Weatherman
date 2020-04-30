@@ -31,8 +31,8 @@
     </div>        
     <div class="navbar-collapse collapse">            
       <ul class="nav navbar-nav">  
-        <li><a href="{{ url_for('serve_weather', destination=location) }}">Weather</a></li>              
-        <li><a href="{{ url_for('serve_flights', destination=location) }}">Flights</a></li> 
+        <li><a href="{{ url_for('serve_weather', destination=current_location) }}">Weather</a></li>              
+        <li><a href="{{ url_for('serve_flights', destination=current_location) }}">Flights</a></li> 
         <li><a href="/map">Map</a></li>
       </ul>        
     </div>    
@@ -48,12 +48,12 @@
     <i>unknown longitude</i>{% endif %}.
   </h3>
   </div>
-    <h4>Check out the weather at <a href="{{ url_for('serve_weather', destination=location) }}">/weather</a>, and flights at <a href="{{ url_for('serve_flights', destination=location) }}">/flights</a></h4>
+    <h4>Check out the weather at <a href="{{ url_for('serve_weather', destination=current_location) }}">/weather</a>, and flights at <a href="{{ url_for('serve_flights', destination=current_location) }}">/flights</a></h4>
   </div>
     {{ wtf.quick_form(form) }}
     <div>
       <p>{{now}}</p>
-      <p>Address coming from view function: {{ address }}</p>
+      <p>Current Location coming from view function: {{ current_location }}</p>
       <p>Coordinates coming from view function: {{ coords }}</p>
       <p>Location var coming from view function: {{ location }}</p>
     </div>
@@ -84,7 +84,7 @@
           container: 'map',
           style: 'mapbox://styles/mapbox/satellite-streets-v10',
           center: [longitude, latitude],
-          zoom: 5,
+          zoom: 18,
           bearing: -17.6,
           pitch: 45
       });

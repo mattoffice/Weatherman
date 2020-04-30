@@ -42,8 +42,15 @@ class Weather_Service:
         response = requests.get(
             "http://api.openweathermap.org/data/2.5/forecast?q={0}&appid=23b9b2cda2de73f546fb9ac14d881d73".format(self.city))
 
-        tomorrow_date = time.gmtime(
-            response.json()['list'][0]['dt']).tm_mday + 1
+        print(response.json())
+        time_obj = time.gmtime(
+            response.json()['list'][0]['dt'])
+        tomorrow_date = time_obj.tm_mday + 1
+
+        if time_obj.tm_mon == 4 or 6 or 9 or 11 and time_obj.tm_mday == 30:
+            tomorrow_date = '01'
+        elif time_obj.tm_mday == 31:
+            tomorrow_date = '01'
 
         data = self.get_results_for_tomorrow(response, tomorrow_date)
         return data
